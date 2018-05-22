@@ -24,7 +24,7 @@ class Logger:
         self.__logger.setLevel(logging.INFO)
 
         if not self.__logger.handlers:
-            formatter = logging.Formatter('%(asctime)s | %(levelname)s : %(message)s')
+            formatter = logging.Formatter('[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s')
             stream_handler = logging.StreamHandler()
             stream_handler.setFormatter(formatter)
             time_handler = handlers.TimedRotatingFileHandler(
