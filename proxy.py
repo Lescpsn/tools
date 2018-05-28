@@ -4,26 +4,20 @@ import random
 import threading
 
 import requests
-import redis as pyredis
+import redis as redis_py
 
-redis = pyredis.StrictRedis(db=14)
+redis = redis_py.StrictRedis(db=15)
 
 
-class Data5u:
-    def __init__(self, token_list, expire_handler=None):
+class Data5uUpdater:
+    def __init__(self, token_list):
         self.token_list = token_list
-        self.expire_handler = expire_handler
 
-        # update proxy in child thread
-        thread_update = threading.Thread(target=self.__get_proxy)
-        thread_update.daemon = True
-        thread_update.start()
+        thread = threading.Thread(target=self.run)
+        thread.daemon = True
+        thread.start()
 
-        # waiting for initialization
-        while not redis.keys():
-            time.sleep(1)
-
-    def __get_proxy(self):
+    def run(self):
         while True:
             time.sleep(1)
             try:
@@ -33,8 +27,6 @@ class Data5u:
                     if 'too many request' in resp.text:
                         continue
                     elif '充值' in resp.text:
-                        if self.expire_handler:
-                            self.expire_handler(token)
                         print(f'data5u >> token expire: {token}')
                         self.token_list.remove(token)
                     else:
@@ -48,6 +40,8 @@ class Data5u:
             except:
                 continue
 
+
+class Data5u:
     @staticmethod
     def get_proxy():
         try:
@@ -72,3 +66,6 @@ class Abuyun:
             'http': f'http://{self.username}:{self.password}@{self.host}:{self.port}',
             'https': f'http://{self.username}:{self.password}@{self.host}:{self.port}'
         }
+
+
+data5u = Data5u()

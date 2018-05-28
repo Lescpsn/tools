@@ -3,6 +3,8 @@ import redis
 import pymongo
 import pymysql
 import hashlib
+import logging
+from logging import handlers
 
 
 def get_redis(host='localhost', port=6379, db=0, password=None):
@@ -81,3 +83,37 @@ def image_to_tiff(src_path, des_path):
     tiff_out = TIFF.open(des_path, 'w')
     tiff_out.write_image(image, compression=None, write_rgb=True)
     tiff_out.close()
+
+
+def get_logger(log_name, interval=1, backup_cnt=7, opt_file=True, opt_stream=True):
+    """
+    Logger for system and custom use.
+    :param log_name: name for log file
+    :param interval: default 1
+    :param backup_cnt: default 7
+    :param opt_file: output to files
+    :param opt_stream: output to command line
+    """
+    log_path = f'{os.path.dirname(__file__)}/../logs/{log_name}/{log_name}.log'
+    log_dir_path = os.path.dirname(log_path)
+    if not os.path.exists(log_dir_path):
+        os.makedirs(log_dir_path)
+
+    logger = logging.getLogger(log_name)
+    logger.setLevel(logging.INFO)
+
+    if not logger.handlers:
+        formatter = logging.Formatter('[%(asctime)s %(filename)s:%(lineno)d] %(levelname)s: %(message)s')
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        time_handler = handlers.TimedRotatingFileHandler(
+            filename=log_path,
+            when='MIDNIGHT',
+            interval=interval,
+            backupCount=backup_cnt,
+            encoding='utf-8'
+        )
+        time_handler.setFormatter(formatter)
+        logger.addHandler(time_handler) if opt_file else None
+        logger.addHandler(stream_handler) if opt_stream else None
+    return logger

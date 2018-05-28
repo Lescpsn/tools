@@ -4,7 +4,7 @@ from logging import handlers
 
 
 class Logger:
-    def __init__(self, root_path, log_name, **kwargs):
+    def __init__(self, root_path, log_name, interval=1, backup_cnt=7, file_handler=True, stream_handler=True):
         """Logger for system and custom use
         Arguments:
             root_path: root path of your project
@@ -12,8 +12,6 @@ class Logger:
             interval: default 1
             backup_count: default 7
         """
-        interval = kwargs.get('interval', 1)
-        backup_cnt = kwargs.get('backup_count', 7)
 
         log_path = f'{root_path}/logs/{log_name}/{log_name}.log'
         log_dir_path = os.path.dirname(log_path)
