@@ -4,7 +4,7 @@ import threading
 import requests
 
 
-class WechatAlarm:
+class Wechat:
     def __init__(self, corpid, corpsecret, agentid):
         self.corpid = corpid
         self.corpsecret = corpsecret
@@ -30,7 +30,7 @@ class WechatAlarm:
             except:
                 return self.__get_token()
 
-    def send_alarm(self, message):
+    def send_msg(self, message):
         try:
             url = f'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={self.access_token}'
             data = {
